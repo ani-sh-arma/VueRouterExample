@@ -1,11 +1,35 @@
 <script setup>
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter, useRoute } from "vue-router";
+import { uid } from "uid";
 import BaseModel from "./BaseModel.vue";
 import { ref } from "vue";
 
 const modelActive = ref(null);
+const savedCities = ref([]);
+const router = useRouter();
+const route = useRoute();
+
 const toggleModel = () => {
   modelActive.value = !modelActive.value;
+};
+
+const saveCity = () => {
+  if (localStorage.getItem("savedCities")) {
+    savedCities.value = JSON.parse(localStorage.getItem("savedCities"));
+  }
+
+  const locationObj = {
+    id: uid(),
+    state: route.params.state,
+    city: route.params.city,
+  };
+
+  savedCities.value.push(locationObj);
+  localStorage.setItem("savedCities", JSON.stringify(savedCities.value));
+
+  let query = Object.assign({}, route.query);
+  delete query.preview;
+  router.replace({ query });
 };
 </script>
 
@@ -27,6 +51,8 @@ const toggleModel = () => {
         ></i>
         <i
           class="fa-solid fa-plus text-xl hover:text-secondary duration-150 cursor-pointer"
+          @click="saveCity"
+          v-if="route.query.preview"
         ></i>
       </div>
       <BaseModel :modelActive="modelActive" @close-model="toggleModel">
@@ -36,8 +62,8 @@ const toggleModel = () => {
           eaque harum voluptatibus dolor excepturi molestiae aliquam repellat
           labore neque ab perspiciatis officia vero quibusdam assumenda iure
           aperiam voluptas amet deserunt recusandae, dicta consequatur nesciunt
-          nulla eveniet. Explicabo iste nemo saepe quas amet voluptas, doloremque,
-          esse eaque libero cum porro?
+          nulla eveniet. Explicabo iste nemo saepe quas amet voluptas,
+          doloremque, esse eaque libero cum porro?
         </p>
       </BaseModel>
     </nav>

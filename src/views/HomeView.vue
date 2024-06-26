@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import CityList from "../components/CityList.vue";
 
 const searchQuery = ref("");
 const searchError = ref("");
@@ -25,12 +26,7 @@ const searchCity = () => {
         cities.value = data.filter((result) => {
           const address = result.address;
           showNoResults.value = true;
-          return (
-            address.city ||
-            address.town ||
-            address.village ||
-            address.state_district
-          );
+          return address.city || address.town || address.village;
         });
       })
       .catch((error) => console.error("Error fetching data:", error));
@@ -43,7 +39,6 @@ const previewCity = (city) => {
   showNoResults.value = false;
   searchQuery.value = city.display_name;
   cities.value = [];
-  console.log(city, cityName, cityState);
 
   router.push({
     name: "cityview",
@@ -52,6 +47,7 @@ const previewCity = (city) => {
       lat: city.lat,
       lng: city.lon,
       query: searchQuery.value,
+      cityName: cityName,
       preview: true,
     },
   });
@@ -89,10 +85,19 @@ const previewCity = (city) => {
       </p>
       <p
         v-else-if="searchQuery && !cities.length && showNoResults"
-        class="absolute bg-gray-800 w-full shadow-md py-2 px-1"
+        class="absolute bg-gray-800 w-full shadow-md py-2 px-4"
       >
         No results, try something else.
       </p>
+    </div>
+
+    <div class="flex flex-col gap-4">
+      <Suspense>
+        <CityList />
+        <template #fallback>
+          <h1>Loading...</h1>
+          </template>
+      </Suspense>
     </div>
   </main>
 </template>
