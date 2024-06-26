@@ -121,7 +121,7 @@
         <h1 class="text-2xl">Sunrise</h1>
         <h1 class="text-2xl">Sunset</h1>
       </div>
-      <div class="w-full bg-gray-800 rounded-full h-4">
+      <div class="w-full bg-gray-800 rounded-full h-4 overflow-hidden">
         <div
           class="h-4 rounded-full float-right relative flex flex-row"
           :style="{width: dayFinished + '%'}"
