@@ -52,8 +52,8 @@ const removeCity = () => {
     >
       <RouterLink>
         <div class="flex items-center gap-3">
-          <i class="fa-solid fa-sun text-2xl"></i>
-          <p class="text-2xl">Local Weather</p>
+          <i class="fa-solid fa-sun text-2xl text-white"></i>
+          <p class="text-2xl text-white">Local Weather</p>
         </div>
       </RouterLink>
       <div class="flex gap-3 flex-1 justify-end">
