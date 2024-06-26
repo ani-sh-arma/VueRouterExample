@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import CityList from "../components/CityList.vue";
 
 const searchQuery = ref("");
@@ -9,6 +9,7 @@ const showNoResults = ref(true);
 const cities = ref([]);
 const queryTimeout = ref(null);
 const router = useRouter();
+const route = useRoute();
 
 const searchCity = () => {
   clearTimeout(queryTimeout.value);
@@ -36,21 +37,46 @@ const searchCity = () => {
 const previewCity = (city) => {
   const cityName = city.name;
   const cityState = city.address.state;
+  const previewValue = ref(true);
   showNoResults.value = false;
   searchQuery.value = city.display_name;
   cities.value = [];
 
-  router.push({
-    name: "cityview",
-    params: { state: cityState, city: cityName },
-    query: {
-      lat: city.lat,
-      lng: city.lon,
-      query: searchQuery.value,
-      cityName: cityName,
-      preview: true,
-    },
-  });
+  const savedCities = JSON.parse(localStorage.getItem("savedCities")) || [];
+
+  // Check if the city is already in savedCities
+  const cityExists = savedCities.some(
+    (savedCity) => savedCity.city === cityName && savedCity.state === cityState
+  );
+
+  console.log(savedCities);
+
+  if (cityExists) {
+    console.log("City already exists, not sending preview");
+    router.push({
+      name: "cityview",
+      params: { state: cityState, city: cityName },
+      query: {
+        lat: city.lat,
+        lng: city.lon,
+        query: searchQuery.value,
+        cityName: cityName,
+      },
+    });
+  } else {
+    console.log("With preview");
+    router.push({
+      name: "cityview",
+      params: { state: cityState, city: cityName },
+      query: {
+        lat: city.lat,
+        lng: city.lon,
+        query: searchQuery.value,
+        cityName: cityName,
+        preview: true,
+      },
+    });
+  }
 };
 </script>
 
@@ -61,7 +87,7 @@ const previewCity = (city) => {
         @input="searchCity"
         v-model="searchQuery"
         type="text"
-        class="w-full bg-gray-800 py-2 px-4 bg-transparent focus:outline-none focus:border-b focus:border-secondary"
+        class="w-full bg-gray-800 py-2 px-4 z-0 bg-transparent focus:outline-none focus:border-b focus:border-secondary"
         placeholder="Search for a city"
       />
       <ul
@@ -95,8 +121,8 @@ const previewCity = (city) => {
       <Suspense>
         <CityList />
         <template #fallback>
-          <h1>Loading...</h1>
-          </template>
+          <h1 class="text-2xl text-center">Loading...</h1>
+        </template>
       </Suspense>
     </div>
   </main>

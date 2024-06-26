@@ -2,12 +2,14 @@
 import { RouterLink, useRouter, useRoute } from "vue-router";
 import { uid } from "uid";
 import BaseModel from "./BaseModel.vue";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 const modelActive = ref(null);
 const savedCities = ref([]);
 const router = useRouter();
 const route = useRoute();
+
+const isHomePage = computed(() => route.path === "/" || route.name === "home");
 
 const toggleModel = () => {
   modelActive.value = !modelActive.value;
@@ -31,10 +33,20 @@ const saveCity = () => {
   delete query.preview;
   router.replace({ query });
 };
+
+const removeCity = () => {
+  const cities = JSON.parse(localStorage.getItem("savedCities"));
+
+  console.log(route.query.id);
+
+  const updatedCities = cities.filter((city) => city.id !== route.query.id);
+  localStorage.setItem("savedCities", JSON.stringify(updatedCities));
+  router.push({ name: "home" });
+};
 </script>
 
 <template>
-  <header class="sticky top-0 bg-primary shadow-lg">
+  <header class="sticky top-0 bg-primary shadow-lg z-10">
     <nav
       class="container flex flex-col sm:flex-row items-center gap-4 text-white py-6"
     >
@@ -54,17 +66,31 @@ const saveCity = () => {
           @click="saveCity"
           v-if="route.query.preview"
         ></i>
+        <i
+          class="fa-solid fa-trash text-xl hover:text-red-500 duration-150 cursor-pointer"
+          @click="removeCity"
+          v-if="!route.query.preview && !isHomePage"
+        ></i>
       </div>
       <BaseModel :modelActive="modelActive" @close-model="toggleModel">
-        <h1 class="text-black text-xl">How to use this app</h1>
-        <p class="text-gray-600">
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quo totam
-          eaque harum voluptatibus dolor excepturi molestiae aliquam repellat
-          labore neque ab perspiciatis officia vero quibusdam assumenda iure
-          aperiam voluptas amet deserunt recusandae, dicta consequatur nesciunt
-          nulla eveniet. Explicabo iste nemo saepe quas amet voluptas,
-          doloremque, esse eaque libero cum porro?
-        </p>
+        <h1 class="text-black text-2xl mb-4">How to use this app</h1>
+        <ul>
+          <li class="text-gray-800">➯ Search your city in the search bar.</li>
+          <li class="text-gray-800">
+            ➯ Click on your city from the suggested cities.
+          </li>
+          <li class="text-gray-800">➯ Check weather details.</li>
+          <li class="text-gray-800">
+            ➯ Click on the "+" icon to add the current city on your homepage.
+          </li>
+          <li class="text-gray-800">
+            ➯ Saved cities will be tracked for you for easy access.
+          </li>
+          <li class="text-gray-800">
+            ➯ Click on the city of your choice from the list of saved cities on
+            your homepage to see it's weather information.
+          </li>
+        </ul>
       </BaseModel>
     </nav>
   </header>

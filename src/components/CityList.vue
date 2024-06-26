@@ -33,6 +33,7 @@ const goToCityView = (city) => {
     name: "cityview",
     params: { state: city.state, city: city.city },
     query: {
+      id: city.id,
       cityName: city.city,
     },
   });
@@ -44,7 +45,9 @@ const goToCityView = (city) => {
     <CityCard :city="city" @click="goToCityView(city)" />
   </div>
 
-  <p v-if="savedCities.length === 0">
+  <p v-if="savedCities.length === 0" class="text-center text-xl mt-20">
     No cities saved. Search above to start tracking.
   </p>
+
+  <div class="h-4"></div>
 </template>
